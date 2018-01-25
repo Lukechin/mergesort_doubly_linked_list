@@ -94,17 +94,33 @@ void mergeSort(List** head_ref)
     *head_ref = merge(left, right);
 }
 
+void checkList(List* source)
+{
+    List *fast = source->next;
+    List *slow = source;
+    while (fast != NULL) {
+        if (fast->data < slow->data) {
+            printf("mergesort is wrong.\n");
+            return;
+        } else {
+            slow = slow->next;
+            fast = fast->next;
+        }
+    }
+    printf("mergesort is correct.\n");
+}
+
 int main()
 {
     List *a = NULL;
 
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 10; i++) {
         insertNodeAtBegin(&a, rand()%100);
     }
 
     printList(a);
     mergeSort(&a);
     printList(a);
-
+    checkList(a);
     return 0;
 }
