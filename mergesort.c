@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 typedef struct __List {
     struct __List *next, *prev;
@@ -114,6 +115,7 @@ int main()
 {
     List *a = NULL;
 
+    srand(time(NULL));
     for (int i = 0; i < 10; i++) {
         insertNodeAtBegin(&a, rand()%100);
     }
