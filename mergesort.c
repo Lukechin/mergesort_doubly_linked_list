@@ -110,6 +110,15 @@ void checkList(List* source)
     printf("mergesort is correct.\n");
 }
 
+void freeList(List* source)
+{
+    while (source) {
+        List *to_be_free = source;
+        source = source->next;
+        free(to_be_free);
+    }
+}
+
 int main()
 {
     List *a = NULL;
@@ -122,5 +131,6 @@ int main()
     mergeSort(&a);
     printList(a);
     checkList(a);
+    freeList(a);
     return 0;
 }
