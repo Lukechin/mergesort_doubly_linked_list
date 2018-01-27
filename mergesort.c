@@ -1,71 +1,70 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <time.h>
 
 typedef struct __List {
     struct __List *next, *prev;
     int data;
 } List;
 
-void printList(List *node)
+void dump(List *node)
 {
     int count = 0;
-    while (node != NULL) {
-        printf("%2d ", node->data);
-        node = node->next;
-        count++;
-        if(count==20) {
+    while (node) {
+        printf("%3d ", node->data);
+        if(++count == 20) {
             printf("\n");
             count = 0;
         }
+        node = node->next;
     }
     printf("\n");
 }
 
-void insertNodeAtBegin(List **start_ref, int new_data)
+void append(List **ref, int data)
 {
     List *ptr = (List *)malloc(sizeof(List));
-    ptr->data = new_data;
+    ptr->data = data;
     ptr->next = ptr->prev = NULL;
-    if((*start_ref)==NULL) {
-        (*start_ref) = ptr;
+    if(!(*ref)) {
+        (*ref) = ptr;
     } else {
-        ptr->next = *start_ref;
-        (*start_ref)->prev = ptr;
-        (*start_ref) = ptr;
+        ptr->next = *ref;
+        (*ref)->prev = ptr;
+        (*ref) = ptr;
     }
 }
 
-void findMidOfList(List* source, List** left_ref, List** right_ref)
+void split(List* source, List** left_ref, List** right_ref)
 {
-    if(source==NULL || source->next==NULL) {
+    if(!source || !source->next) {
         *left_ref = source;
         *right_ref = NULL;
-    } else {
-        List *fast = source->next;
-        List *slow = source;
-
-        while(fast != NULL) {
-            fast = fast->next;
-            if(fast != NULL) {
-                slow = slow->next;
-                fast = fast->next;
-            }
-        }
-        *left_ref = source;
-        *right_ref = slow->next;
-        slow->next = NULL;
+        return;
     }
+
+    List *slow = source;
+    for (List *fast = source->next; fast;) {
+        if((fast = fast->next)) {
+            slow = slow->next;
+            fast = fast->next;
+        }
+    }
+    *left_ref = source;
+    *right_ref = slow->next;
+    slow->next = NULL;
 }
 
-List* merge(List* left, List* right)
+static List* merge(List* left, List* right)
 {
-    if (left==NULL)
+    if (!left)
         return right;
-    else if(right==NULL)
+    if (!right)
         return left;
 
-    List *result = NULL;
-    if(left->data<=right->data) {
+    List *result;
+    if (left->data <= right->data) {
         result = left;
         result->next = merge(left->next, right);
         result->prev = left->prev;
@@ -79,14 +78,12 @@ List* merge(List* left, List* right)
 
 void mergeSort(List** head_ref)
 {
-    if((head_ref==NULL) || ((*head_ref)->next==NULL))
+    if(!head_ref || !(*head_ref)->next)
         return;
 
-    List *head = *head_ref;
-    List *left;
-    List *right;
+    List *left, *right;
 
-    findMidOfList(head, &left, &right);
+    split(*head_ref, &left, &right);
 
     mergeSort(&left);
     mergeSort(&right);
@@ -94,33 +91,29 @@ void mergeSort(List** head_ref)
     *head_ref = merge(left, right);
 }
 
-void checkList(List* source)
+bool validate(List* source)
 {
-    List *fast = source->next;
-    List *slow = source;
-    while (fast != NULL) {
+    for (List *slow = source, *fast = source->next; fast;
+            slow = slow->next, fast = fast->next) {
         if (fast->data < slow->data) {
-            printf("mergesort is wrong.\n");
-            return;
-        } else {
-            slow = slow->next;
-            fast = fast->next;
+            return false;
         }
     }
-    printf("mergesort is correct.\n");
+    return true;
 }
 
 int main()
 {
-    List *a = NULL;
-
-    for (int i = 0; i < 10; i++) {
-        insertNodeAtBegin(&a, rand()%100);
+    List *list = NULL;
+    srand(time(NULL));
+    for (int i = 0; i < 100; i++) {
+        append(&list, rand() % 200 + 1);
     }
 
-    printList(a);
-    mergeSort(&a);
-    printList(a);
-    checkList(a);
+    dump(list);
+    mergeSort(&list);
+    dump(list);
+
+    printf("Mergesort is %s\n", validate(list) ? "correct." : "wrong.");
     return 0;
 }
