@@ -102,6 +102,11 @@ bool validate(List* source)
     return true;
 }
 
+void freeList(List* source)
+{
+    for (; source; source = source->next) free(source);
+}
+
 int main()
 {
     List *list = NULL;
@@ -115,5 +120,8 @@ int main()
     dump(list);
 
     printf("Mergesort is %s\n", validate(list) ? "correct." : "wrong.");
+
+    freeList(list);
+    
     return 0;
 }
