@@ -104,11 +104,7 @@ bool validate(List* source)
 
 void freeList(List* source)
 {
-    while (source) {
-        List *to_be_free = source;
-        source = source->next;
-        free(to_be_free);
-    }
+    for (; source; source = source->next) free(source);
 }
 
 int main()
