@@ -67,11 +67,11 @@ static List* merge(List* left, List* right)
     if (left->data <= right->data) {
         result = left;
         result->next = merge(left->next, right);
-        result->prev = left->prev;
+        result->next->prev = result;
     } else {
         result = right;
         result->next = merge(left, right->next);
-        result->prev = right->prev;
+        result->next->prev = result;
     }
     return result;
 }
